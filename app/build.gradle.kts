@@ -290,7 +290,17 @@ dependencies {
     implementation(libs.mlkit.text.recognition.chinese)
     implementation(libs.mlkit.text.translate)
     implementation(libs.google.generativeai)
-    implementation("com.github.jeziellago:opencv-android:4.1.0")
+    
+    // تحميل ملف الـ AAR الخاص بـ OpenCV مباشرة وتجنب خطأ الـ 401 والتفويض المكسور
+    implementation(files(provider {
+        val aarFile = file("build/opencv-android-4.1.0.aar")
+        if (!aarFile.exists()) {
+            aarFile.parentFile.mkdirs()
+            java.net.URL("https://jitpack.io/com/github/jeziellago/opencv-android/4.1.0/opencv-android-4.1.0.aar")
+                .openStream().use { input -> aarFile.outputStream().use { output -> input.copyTo(output) } }
+        }
+        aarFile
+    }))
 }
 
 androidComponents {
@@ -314,3 +324,4 @@ buildscript {
         classpath(kotlinx.gradle)
     }
 }
+
