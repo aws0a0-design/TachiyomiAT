@@ -1,6 +1,8 @@
 package eu.kanade.translation.model
 
+import android.graphics.Bitmap
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class PageTranslation(
@@ -8,6 +10,11 @@ data class PageTranslation(
     var imgWidth: Float = 0f,
     var imgHeight: Float = 0f,
 ) {
+    @Transient
+    var cleanedBitmap: Bitmap? = null
+
+    @Transient
+    var renderedBitmap: Bitmap? = null
     companion object {
         val EMPTY = PageTranslation()
     }

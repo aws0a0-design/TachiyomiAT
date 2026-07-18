@@ -8,6 +8,8 @@ import eu.kanade.tachiyomi.data.download.DownloadProvider
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.util.lang.compareToCaseInsensitiveNaturalOrder
 import eu.kanade.tachiyomi.util.system.toast
+import android.graphics.BitmapFactory
+import eu.kanade.translation.cleaner.OpenCvTextCleaner
 import eu.kanade.translation.data.TranslationProvider
 import eu.kanade.translation.model.PageTranslation
 import eu.kanade.translation.model.Translation
@@ -75,6 +77,7 @@ class ChapterTranslator(
 
     private var textRecognizer: TextRecognizer
     private var textTranslator: TextTranslator
+    private val textCleaner = OpenCvTextCleaner(context)
 
     init {
         val fromLang = TextRecognizerLanguage.fromPref(translationPreferences.translateFromLanguage())
@@ -234,13 +237,23 @@ class ChapterTranslator(
                     val result = textRecognizer.recognize(image)
                     val blocks = result.textBlocks.filter { it.boundingBox != null && it.text.length > 1 }
                     val pageTranslation = convertToPageTranslation(blocks, image.width, image.height)
-                    if (pageTranslation.blocks.isNotEmpty()) pages[fileName] = pageTranslation
+                    if (pageTranslation.blocks.isNotEmpty()) {
+                        val sourceBitmap = BitmapFactory.decodeFile(tmpFile.uri.path)
+                        if (sourceBitmap != null) {
+                            pageTranslation.cleanedBitmap = textCleaner.clean(sourceBitmap, pageTranslation.blocks)
+                        }
+                        pages[fileName] = pageTranslation
+                    }
                 }
             }
             tmpFile.delete()
             withContext(Dispatchers.IO) {
-                // Translate the text in blocks , this mutates the original blocks
+                // Translate the text in blocks, then render the translated text over the cleaned bitmap.
                 textTranslator.translate(pages)
+                pages.values.forEach { page ->
+                    val cleanedBitmap = page.cleanedBitmap ?: return@forEach
+                    page.renderedBitmap = textCleaner.renderTranslatedText(cleanedBitmap, page.blocks)
+                }
             }
             // Serialize the Map and save to translations json file
             Json.encodeToStream(pages, translationMangaDir.createFile(saveFile)!!.openOutputStream())
