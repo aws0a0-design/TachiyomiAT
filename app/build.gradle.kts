@@ -209,6 +209,7 @@ dependencies {
     implementation(androidx.viewpager)
     implementation(androidx.profileinstaller)
 
+    // Analytics / Lifecycle
     implementation(androidx.bundles.lifecycle)
 
     // Job scheduling
@@ -289,7 +290,7 @@ dependencies {
     implementation(libs.mlkit.text.recognition.chinese)
     implementation(libs.mlkit.text.translate)
     implementation(libs.google.generativeai)
-    implementation("org.opencv:opencv-android:4.10.0")
+    implementation("org.opencv:opencv-android:4.9.3")
 }
 
 androidComponents {
