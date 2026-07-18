@@ -291,17 +291,8 @@ dependencies {
     implementation(libs.mlkit.text.translate)
     implementation(libs.google.generativeai)
     
-    // استخدام أمر curl الخاص بنظام التشغيل مباشرة لتخطي جدار حماية جافا وجيردل المكسور
-    implementation(files(provider {
-        val aarFile = file("build/opencv-android-4.1.0.aar")
-        if (!aarFile.exists()) {
-            aarFile.parentFile.mkdirs()
-            exec {
-                commandLine("curl", "-L", "-o", aarFile.absolutePath, "https://jitpack.io/com/github/jeziellago/opencv-android/4.1.0/opencv-android-4.1.0.aar")
-            }
-        }
-        aarFile
-    }))
+    // مكتبة عامة ومستقرة ومرفوعة على خوادم جيت هاب الرسمية المفتوحة Maven Central
+    implementation("tech.shmy:opencv-android:4.5.1")
 }
 
 androidComponents {
@@ -325,3 +316,4 @@ buildscript {
         classpath(kotlinx.gradle)
     }
 }
+
