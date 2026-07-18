@@ -290,7 +290,7 @@ dependencies {
     implementation(libs.mlkit.text.recognition.chinese)
     implementation(libs.mlkit.text.translate)
     implementation(libs.google.generativeai)
-    implementation("com.github.jeziellago:opencv-android:4.6.0")
+    implementation("com.quickbirdstudios:opencv-android:4.5.3.0")
 }
 
 androidComponents {
