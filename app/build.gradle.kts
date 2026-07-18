@@ -1,5 +1,6 @@
 @file:Suppress("ChromeOsAbiSupport")
 
+import java.net.URL
 import mihon.buildlogic.getBuildTime
 import mihon.buildlogic.getCommitCount
 import mihon.buildlogic.getGitSha
@@ -224,11 +225,6 @@ dependencies {
     implementation(libs.conscrypt.android) // TLS 1.3 support for Android < 10
 
     // Data serialization (JSON, protobuf, xml)
-    implementation(kotlinx.bundles.serialization)
-
-    // HTML parser
-    implementation(libs.jsoup)
-
     // Disk
     implementation(libs.disklrucache)
     implementation(libs.unifile)
@@ -291,13 +287,21 @@ dependencies {
     implementation(libs.mlkit.text.translate)
     implementation(libs.google.generativeai)
     
-    // تحميل ملف الـ AAR الخاص بـ OpenCV مباشرة وتجنب خطأ الـ 401 والتفويض المكسور
+    // تحميل آمن ومباشر للملف وتخطي عقبات الترجمة وجدران الحماية الخاطئة لـ جيت هاب
     implementation(files(provider {
         val aarFile = file("build/opencv-android-4.1.0.aar")
         if (!aarFile.exists()) {
             aarFile.parentFile.mkdirs()
-            java.net.URL("https://jitpack.io/com/github/jeziellago/opencv-android/4.1.0/opencv-android-4.1.0.aar")
-                .openStream().use { input -> aarFile.outputStream().use { output -> input.copyTo(output) } }
+            val inputStream = URL("https://jitpack.io/com/github/jeziellago/opencv-android/4.1.0/opencv-android-4.1.0.aar").openStream()
+            val outputStream = aarFile.outputStream()
+            val buffer = ByteArray(4096)
+            var bytesRead = inputStream.read(buffer)
+            while (bytesRead != -1) {
+                outputStream.write(buffer, 0, bytesRead)
+                bytesRead = inputStream.read(buffer)
+            }
+            inputStream.close()
+            outputStream.close()
         }
         aarFile
     }))
@@ -324,4 +328,3 @@ buildscript {
         classpath(kotlinx.gradle)
     }
 }
-
