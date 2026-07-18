@@ -291,8 +291,8 @@ dependencies {
     implementation(libs.mlkit.text.translate)
     implementation(libs.google.generativeai)
     
-    // مكتبة عامة ومستقرة ومرفوعة على خوادم جيت هاب الرسمية المفتوحة Maven Central
-    implementation("tech.shmy:opencv-android:4.5.1")
+    // مستودع رسمي مفتوح ومستقر تماماً ولن يتسبب في خطأ الـ 401 أو الـ 404
+    implementation("com.github.quickbirdstudios:opencv-android:4.5.3.0")
 }
 
 androidComponents {
